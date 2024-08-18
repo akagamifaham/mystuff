@@ -1,6 +1,4 @@
-// src/components/Profile.js
-
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Modal from "./Modal";
 
 const Profile = () => {
@@ -25,48 +23,59 @@ const Profile = () => {
   };
 
   useEffect(() => {
-    const fetchPhotos = async () => {
+    const fetchPhotosAndPresence = async () => {
       setLoading(true);
-      const fetchedPhotos = [];
-      for (let i = 0; i < 27; i++) {
-        // Simulate fetching 27 photos
-        fetchedPhotos.push(`https://picsum.photos/500?random=${i}`);
-      }
-      setPhotos(fetchedPhotos);
-      setVisiblePhotos(fetchedPhotos.slice(0, photosPerPage));
+
+      const fetchPhotos = () => {
+        const fetchedPhotos = Array.from(
+          { length: 27 },
+          (_, i) => `https://picsum.photos/500?random=${i}`
+        );
+        return fetchedPhotos;
+      };
+
+      const fetchDiscordPresence = async () => {
+        try {
+          const response = await fetch(
+            "https://api.lanyard.rest/v1/users/395904048982654987"
+          );
+          const data = await response.json();
+          return data.data;
+        } catch (error) {
+          console.error("Error fetching Discord presence:", error);
+          return null;
+        }
+      };
+
+      const [photos, presence] = await Promise.all([
+        fetchPhotos(),
+        fetchDiscordPresence(),
+      ]);
+
+      setPhotos(photos);
+      setVisiblePhotos(photos.slice(0, photosPerPage));
+      setDiscordPresence(presence);
       setLoading(false);
     };
 
-    const fetchDiscordPresence = async () => {
-      try {
-        const response = await fetch(
-          "https://api.lanyard.rest/v1/users/395904048982654987"
-        );
-        const data = await response.json();
-        setDiscordPresence(data.data);
-      } catch (error) {
-        console.error("Error fetching Discord presence:", error);
-      }
-    };
-
-    fetchPhotos();
-    fetchDiscordPresence();
+    fetchPhotosAndPresence();
   }, []);
 
-  const loadMorePhotos = () => {
-    const newPage = page + 1;
-    const newVisiblePhotos = photos.slice(0, newPage * photosPerPage);
-    setVisiblePhotos(newVisiblePhotos);
-    setPage(newPage);
-  };
+  const loadMorePhotos = useCallback(() => {
+    setPage((prevPage) => {
+      const newPage = prevPage + 1;
+      setVisiblePhotos(photos.slice(0, newPage * photosPerPage));
+      return newPage;
+    });
+  }, [photos]);
 
-  const handleImageClick = (imageSrc) => {
+  const handleImageClick = useCallback((imageSrc) => {
     setSelectedImage(imageSrc);
-  };
+  }, []);
 
-  const closeModal = () => {
+  const closeModal = useCallback(() => {
     setSelectedImage(null);
-  };
+  }, []);
 
   return (
     <div className="max-w-4xl mx-auto p-4 dark:bg-gray-900 dark:text-white">
@@ -86,7 +95,7 @@ const Profile = () => {
             src={
               statusIcons[discordPresence.discord_status] || statusIcons.offline
             }
-            alt={discordPresence.discord_status}
+            alt={`${discordPresence.discord_status} status`}
             className="w-8 h-8 rounded-full absolute translate-x-14 translate-y-20 md:translate-x-32 md:translate-y-6 bg-white"
           />
         )}
@@ -109,7 +118,7 @@ const Profile = () => {
           >
             <img
               src={photo}
-              alt={`Post ${index + 1}`}
+              alt={`Random photo ${index + 1}`}
               className="object-cover w-full h-full transform hover:scale-105 transition-transform duration-300 cursor-pointer"
             />
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent opacity-70 p-2">
@@ -120,21 +129,21 @@ const Profile = () => {
       </div>
 
       {/* Loading and Load More Button */}
-      {loading && (
+      {loading ? (
         <div className="text-center py-4">
           <div className="loader">Loading...</div>
         </div>
-      )}
-
-      {!loading && visiblePhotos.length < photos.length && (
-        <div className="text-center py-4">
-          <button
-            onClick={loadMorePhotos}
-            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
-          >
-            Load More
-          </button>
-        </div>
+      ) : (
+        visiblePhotos.length < photos.length && (
+          <div className="text-center py-4">
+            <button
+              onClick={loadMorePhotos}
+              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
+            >
+              Load More
+            </button>
+          </div>
+        )
       )}
 
       <Modal
