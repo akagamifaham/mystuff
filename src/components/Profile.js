@@ -2,8 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import Modal from "./Modal";
 
 const Profile = () => {
-  const bio =
-    "Life is what happens when you're busy making other plans. — John Lennon"; // Quote about life
+  const bio = "𝐁𝐞𝐢𝐧𝐠 𝐡𝐚𝐩𝐩𝐲 𝐢𝐬 𝐤𝐧𝐨𝐰𝐢𝐧𝐠 𝐡𝐨𝐰 𝐭𝐨 𝐛𝐞 𝐜𝐨𝐧𝐭𝐞𝐧𝐭 𝐰𝐢𝐭𝐡 𝐥𝐢𝐭𝐭𝐥𝐞";
 
   const [photos, setPhotos] = useState([]);
   const [visiblePhotos, setVisiblePhotos] = useState([]);
@@ -105,6 +104,57 @@ const Profile = () => {
               discordPresence?.discord_user.username}
           </h1>
           <p className="mt-2 text-gray-600 dark:text-gray-300">{bio}</p>
+          {/* Social Icons */}
+          <div className="flex justify-center md:justify-start mt-4 space-x-4">
+            <a
+              href="https://www.instagram.com/kenzi.vrc/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+            >
+              <img
+                src="https://img.icons8.com/ios-filled/50/000000/instagram-new.png"
+                alt="Instagram"
+                className="w-6 h-6 dark:invert"
+              />
+            </a>
+            <a
+              href="https://discord.com/users/395904048982654987"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Discord"
+            >
+              <img
+                src="https://img.icons8.com/ios-filled/50/000000/discord-logo.png"
+                alt="Discord"
+                className="w-6 h-6 dark:invert"
+              />
+            </a>
+            <a
+              href="https://steamcommunity.com/id/letsmakecakes/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Steam"
+            >
+              <img
+                src="https://img.icons8.com/ios-filled/50/000000/steam.png"
+                alt="Steam"
+                className="w-6 h-6 dark:invert"
+              />
+            </a>
+            <a
+              href="https://open.spotify.com/user/7hqx6yxcc92tzcmu95e7p8082?si=78e29edeb7c84006"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Spotify"
+            >
+              <img
+                src="https://img.icons8.com/ios-filled/50/000000/spotify.png"
+                alt="Spotify"
+                className="w-6 h-6 dark:invert"
+              />
+            </a>
+          </div>
         </div>
       </div>
 
